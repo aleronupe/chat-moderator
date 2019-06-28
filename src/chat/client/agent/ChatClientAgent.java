@@ -213,18 +213,22 @@ public class ChatClientAgent extends Agent {
 		public void action() {
 			ACLMessage msg = myAgent.receive(template);
 			if (msg != null) {
-				if (msg.getPerformative() == ACLMessage.INFORM) {
-					System.out.print(msg.getSender().getLocalName());
-					notifySpoken(msg.getSender().getLocalName(),
-							msg.getContent());
+				if(msg.getSender().getLocalName().equals("[MODERATOR]") && msg.getContent().contains(myAgent.getLocalName() + " has been banned.")) {
+					myAgent.doDelete();
 				} else {
-					handleUnexpected(msg);
+					if (msg.getPerformative() == ACLMessage.INFORM) {
+						notifySpoken(msg.getSender().getLocalName(),
+								msg.getContent());
+					} else {
+						handleUnexpected(msg);
+					}
 				}
 			} else {
 				block();
 			}
 		}
 	} // END of inner class ChatListener
+
 
 	/**
 	 * Inner class ChatSpeaker. INFORMs other participants about a spoken

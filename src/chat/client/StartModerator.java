@@ -86,7 +86,7 @@ public class StartModerator extends MicroBoot {
 	  	}
 	  	else {
 	  		try {
-	  			name = "[MODERATOR] " + name;
+	  			name = "[MODERATOR]";
 				MicroRuntime.startAgent(name, "chat.client.agent.ModeratorAgent", null);
 	    		dispose();
     		}

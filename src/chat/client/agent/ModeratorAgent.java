@@ -214,6 +214,16 @@ public class ModeratorAgent extends Agent {
 		public void action() {
 			ACLMessage msg = myAgent.receive(template);
 			if (msg != null) {
+				if (msg.getContent().contains("feio")) {
+					spokenMsg.clearAllReceiver();
+					Iterator it = participants.iterator();
+					while (it.hasNext()) {
+						spokenMsg.addReceiver((AID) it.next());
+					}
+					spokenMsg.setContent(msg.getSender().getLocalName() + " has been banned.");
+					notifySpoken(myAgent.getLocalName(), msg.getSender().getLocalName() + " has been banned.");
+					send(spokenMsg);
+				}
 				if (msg.getPerformative() == ACLMessage.INFORM) {
 					notifySpoken(msg.getSender().getLocalName(),
 							msg.getContent());
