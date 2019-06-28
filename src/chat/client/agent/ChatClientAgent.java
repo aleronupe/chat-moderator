@@ -214,6 +214,7 @@ public class ChatClientAgent extends Agent {
 			ACLMessage msg = myAgent.receive(template);
 			if (msg != null) {
 				if (msg.getPerformative() == ACLMessage.INFORM) {
+					System.out.print(msg.getSender().getLocalName());
 					notifySpoken(msg.getSender().getLocalName(),
 							msg.getContent());
 				} else {
