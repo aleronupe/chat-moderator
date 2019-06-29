@@ -42,6 +42,13 @@ import jade.util.leap.Iterator;
 import jade.util.leap.Set;
 import jade.util.leap.SortedSetImpl;
 import chat.client.ChatGui;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
 /*#MIDP_INCLUDE_BEGIN
 import chat.client.MIDPChatGui;
 #MIDP_INCLUDE_END*/
@@ -77,30 +84,36 @@ public class ModeratorAgent extends Agent {
 	private Codec codec = new SLCodec();
 	private Ontology onto = ChatOntology.getInstance();
 	private ACLMessage spokenMsg;
+	private ArrayList<String> bannedWords = new ArrayList<String>();
 
 	protected void setup() {
-		// Register language and ontology
 		ContentManager cm = getContentManager();
 		cm.registerLanguage(codec);
 		cm.registerOntology(onto);
 		cm.setValidationMode(false);
 
-		// Add initial behaviours
 		addBehaviour(new ParticipantsManager(this));
 		addBehaviour(new ChatListener(this));
 
-		// Initialize the message used to convey spoken sentences
 		spokenMsg = new ACLMessage(ACLMessage.INFORM);
 		spokenMsg.setConversationId(CHAT_ID);
 
-		// Activate the GUI
-		//#MIDP_EXCLUDE_BEGIN
 		myGui = new AWTModeratorGui(this);
-		//#MIDP_EXCLUDE_END
-
-		/*#MIDP_INCLUDE_BEGIN
-		myGui = new MIDPChatGui(this);
-		#MIDP_INCLUDE_END*/
+		
+    try {
+      FileReader file = new FileReader("banned.txt");
+      BufferedReader readFile = new BufferedReader(file);
+      String line = readFile.readLine();
+      while (line != null) {
+        bannedWords.add(line);
+        line = readFile.readLine();
+      }
+      file.close();
+    } catch (IOException e) {
+        System.err.println("err_open_file" + e.getMessage());
+    }
+ 
+    System.out.println();
 	}
 
 	protected void takeDown() {
@@ -213,8 +226,14 @@ public class ModeratorAgent extends Agent {
 
 		public void action() {
 			ACLMessage msg = myAgent.receive(template);
+			boolean banned = false;
 			if (msg != null) {
-				if (msg.getContent().contains("feio")) {
+				for (int i = 0; i < bannedWords.size(); i++) {
+				  if (msg.getContent().contains(bannedWords.get(i))) {
+					  banned = true;
+				  }
+				}
+				if (banned) {
 					spokenMsg.clearAllReceiver();
 					Iterator it = participants.iterator();
 					while (it.hasNext()) {

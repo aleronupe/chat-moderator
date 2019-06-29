@@ -1,0 +1,3 @@
+feio
+cachorro
+gato
