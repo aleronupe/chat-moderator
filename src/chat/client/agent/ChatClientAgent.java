@@ -215,7 +215,7 @@ public class ChatClientAgent extends Agent {
 			if (msg != null) {
 				if(msg.getSender().getLocalName().equals("[MODERATOR]") && msg.getContent().contains(myAgent.getLocalName() + " has been banned.")) {
 					myAgent.doDelete();
-				} else if (msg.getContent().charAt(0) == '/') { // commands from another agent not showed for me
+				} else if (msg.getContent().charAt(0) == '/' && !msg.getContent().contains("shrug")) { // commands from another agent not showed for me
 					//	notifySpoken("",msg.getContent());
 				} else {
 					if (msg.getPerformative() == ACLMessage.INFORM) {
@@ -253,7 +253,16 @@ public class ChatClientAgent extends Agent {
 			}
 			spokenMsg.setContent(sentence);
 			if (sentence.charAt(0) == '/') {
-				notifySpoken("", sentence);
+				if (sentence.contains("/help")) {
+					notifySpoken("", "/slash-commands\n--------\n/ban <username>\n/shrug\n/help\n/exit\n--------\n");
+				} else if (sentence.contains("/exit")) {
+					myAgent.doDelete();
+				} else if (sentence.contains("/shrug")) {
+					notifySpoken(myAgent.getLocalName(), "¯\\_(ツ)_/¯");
+					spokenMsg.setContent("¯\\_(ツ)_/¯");
+				} else {
+					notifySpoken("", sentence);
+				}
 			} else {
 				notifySpoken(myAgent.getLocalName(), sentence);
 			}
