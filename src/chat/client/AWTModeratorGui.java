@@ -47,35 +47,12 @@ public class AWTModeratorGui extends Frame implements ChatGui {
 		setSize(getProperSize(256, 320));
 		Panel p = new Panel();
 		p.setLayout(new BorderLayout());
-		writeTf = new TextField();
-		p.add(writeTf, BorderLayout.CENTER);
-		Button b = new Button("Send");
-		b.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-		  	String s = writeTf.getText();
-		  	if (s != null && !s.equals("")) {
-			  	myAgent.handleSpoken(s);
-			  	writeTf.setText("");
-		  	}
-			} 
-		} );
-		p.add(b, BorderLayout.EAST);
 		add(p, BorderLayout.NORTH);
 		
 		allTa = new TextArea();
 		allTa.setEditable(false);
 		allTa.setBackground(Color.white);
 		add(allTa, BorderLayout.CENTER);
-		
-		b = new Button("Participants");
-		b.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (!participantsFrame.isVisible()) {
-					participantsFrame.setVisible(true);
-				}	
-			} 
-		} );
-		add(b, BorderLayout.SOUTH);
 		
 		addWindowListener(new	WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
