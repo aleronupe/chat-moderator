@@ -47,30 +47,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Map;
 
-/*#MIDP_INCLUDE_BEGIN
-import chat.client.MIDPChatGui;
-#MIDP_INCLUDE_END*/
-//#MIDP_EXCLUDE_BEGIN
-import chat.client.AWTChatGui;
 import chat.client.AWTModeratorGui;
-//#MIDP_EXCLUDE_END
 import chat.ontology.ChatOntology;
 
-/**
- * This agent implements the logic of the chat client running on the user
- * terminal. User interactions are handled by the ChatGui in a
- * terminal-dependent way. The ChatClientAgent performs 3 types of behaviours: -
- * ParticipantsManager. A CyclicBehaviour that keeps the list of participants up
- * to date on the basis of the information received from the ChatManagerAgent.
- * This behaviour is also in charge of subscribing as a participant to the
- * ChatManagerAgent. - ChatListener. A CyclicBehaviour that handles messages
- * from other chat participants. - ChatSpeaker. A OneShotBehaviour that sends a
- * message conveying a sentence written by the user to other chat participants.
- * 
- * @author Giovanni Caire - TILAB
- */
 public class ModeratorAgent extends Agent {
 	private static final long serialVersionUID = 1594371294421614291L;
 
@@ -85,6 +67,7 @@ public class ModeratorAgent extends Agent {
 	private Ontology onto = ChatOntology.getInstance();
 	private ACLMessage spokenMsg;
 	private ArrayList<String> bannedWords = new ArrayList<String>();
+	private Map<String,Integer> ban = new HashMap<String,Integer>();
 
 	protected void setup() {
 		ContentManager cm = getContentManager();
@@ -232,6 +215,24 @@ public class ModeratorAgent extends Agent {
 				  if (msg.getContent().contains(bannedWords.get(i))) {
 					  banned = true;
 				  }
+				}
+				String message = msg.getContent();
+				if (msg.getContent().contains("/ban")) {
+					String[] banName = message.split(" ");
+					if (ban.get(banName[1]) == null) {
+						ban.put(banName[1], 0);
+					}
+					ban.put(banName[1], ban.get(banName[1]) + 1);
+					if (ban.get(banName[1]) == 3) {
+						spokenMsg.clearAllReceiver();
+						Iterator it = participants.iterator();
+						while (it.hasNext()) {
+							spokenMsg.addReceiver((AID) it.next());
+						}
+						spokenMsg.setContent(banName[1] + " has been banned.");
+						notifySpoken(myAgent.getLocalName(), banName[1] + " has been banned.");
+						send(spokenMsg);
+					}
 				}
 				if (banned) {
 					spokenMsg.clearAllReceiver();

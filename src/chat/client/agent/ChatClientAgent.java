@@ -215,6 +215,8 @@ public class ChatClientAgent extends Agent {
 			if (msg != null) {
 				if(msg.getSender().getLocalName().equals("[MODERATOR]") && msg.getContent().contains(myAgent.getLocalName() + " has been banned.")) {
 					myAgent.doDelete();
+				} else if (msg.getContent().charAt(0) == '/') { // commands from another agent not showed for me
+					//	notifySpoken("",msg.getContent());
 				} else {
 					if (msg.getPerformative() == ACLMessage.INFORM) {
 						notifySpoken(msg.getSender().getLocalName(),
@@ -250,7 +252,12 @@ public class ChatClientAgent extends Agent {
 				spokenMsg.addReceiver((AID) it.next());
 			}
 			spokenMsg.setContent(sentence);
-			notifySpoken(myAgent.getLocalName(), sentence);
+			if (sentence.charAt(0) == '/') {
+				notifySpoken("", sentence);
+			} else {
+				notifySpoken(myAgent.getLocalName(), sentence);
+			}
+			
 			send(spokenMsg);
 		}
 	} // END of inner class ChatSpeaker

@@ -94,7 +94,11 @@ public class AWTChatGui extends Frame implements ChatGui {
 	}
 	
 	public void notifySpoken(String speaker, String sentence) {
-		allTa.append(speaker+": "+sentence+"\n");
+		if (sentence.charAt(0) == '/') {
+			allTa.append(sentence+"\n");
+		} else {
+			allTa.append(speaker+": "+sentence+"\n");
+		}
 	}
 	
 	Dimension getProperSize(int maxX, int maxY) {
